@@ -1,0 +1,33 @@
+version: "3"
+
+services:
+  db:
+    image: docker.io/library/mariadb:10.6.22
+    container_name: redmine_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: redmine
+      MYSQL_USER: redmine
+      MYSQL_PASSWORD: redminepass
+    volumes:
+      - ./data/db:/var/lib/mysql
+    restart: always
+
+  redmine:
+    image: docker.io/library/redmine:6.0
+    container_name: redmine_app
+    depends_on:
+      - db
+    environment:
+      REDMINE_DB_MYSQL: db
+      REDMINE_DB_DATABASE: redmine
+      REDMINE_DB_USERNAME: redmine
+      REDMINE_DB_PASSWORD: redminepass
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data/redmine-data:/usr/src/redmine/files
+      - ./data/redmine-plugins:/usr/src/redmine/plugins
+      - ./data/redmine-config/config:/usr/src/redmine/config
+      - ./data/redmine-config/database.yml:/usr/src/redmine/config/database.yml
+    restart: always

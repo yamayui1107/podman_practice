@@ -1,8 +1,28 @@
 version: "3"
 
 services:
+  redmine:
+    build:
+      context: .
+      dockerfile: Dockerfile_redmine
+    container_name: redmine_app
+    ports:
+      - "3001:3000"
+    environment:
+      REDMINE_DB_MYSQL: db
+      REDMINE_DB_DATABASE: redmine
+      REDMINE_DB_USERNAME: redmine
+      REDMINE_DB_PASSWORD: redminepass
+      REDMINE_SECRET_KEY_BASE: supersecretkey
+    depends_on:
+      - db
+    volumes:
+      - ./data/redmine-data:/usr/src/redmine/files
+      - ./data/redmine-plugins:/usr/src/redmine/plugins
+    restart: always
+
   db:
-    image: docker.io/library/mariadb:10.6.22
+    image: docker.io/library/mariadb:11.8
     container_name: redmine_db
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
@@ -11,23 +31,4 @@ services:
       MYSQL_PASSWORD: redminepass
     volumes:
       - ./data/db:/var/lib/mysql
-    restart: always
-
-  redmine:
-    image: docker.io/library/redmine:6.0
-    container_name: redmine_app
-    depends_on:
-      - db
-    environment:
-      REDMINE_DB_MYSQL: db
-      REDMINE_DB_DATABASE: redmine
-      REDMINE_DB_USERNAME: redmine
-      REDMINE_DB_PASSWORD: redminepass
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./data/redmine-data:/usr/src/redmine/files
-      - ./data/redmine-plugins:/usr/src/redmine/plugins
-      - ./data/redmine-config/config:/usr/src/redmine/config
-      - ./data/redmine-config/database.yml:/usr/src/redmine/config/database.yml
     restart: always

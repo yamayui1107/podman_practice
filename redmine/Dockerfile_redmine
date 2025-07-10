@@ -1,0 +1,5 @@
+# Dockerfile.redmine
+FROM docker.io/library/redmine:6.0
+
+# 必要な設定ファイルをコピー
+COPY ./config/configuration.yml usr/src/redmine/config/configuration.yml
